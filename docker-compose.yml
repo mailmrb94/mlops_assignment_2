@@ -1,0 +1,18 @@
+services:
+  classifier:
+    image: ${IMAGE_NAME:-cats-dogs-mlops:local}
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - "${SERVICE_PORT:-8000}:8000"
+    environment:
+      LOG_LEVEL: INFO
+      MODEL_PATH: /app/models/model.joblib
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+

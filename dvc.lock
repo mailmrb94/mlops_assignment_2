@@ -1,0 +1,84 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python scripts/prepare_data.py --input data/raw --output data/processed
+      --params params.yaml
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 5afd58885b3664ee793efbe05d1beb1e.dir
+      size: 15034037
+      nfiles: 602
+    - path: params.yaml
+      hash: md5
+      md5: df02d7fe6af93b28e828336cef9102ca
+      size: 222
+    - path: scripts/prepare_data.py
+      hash: md5
+      md5: b03ee01505002ba8b04ad579fbcc6cfd
+      size: 2790
+    - path: src/mlops_cats_dogs/preprocessing.py
+      hash: md5
+      md5: 6f8c84eae0d2bc96ff92da486eec51c3
+      size: 1655
+    params:
+      params.yaml:
+        prepare:
+          image_size: 224
+          max_per_class: 300
+          seed: 42
+          train_fraction: 0.8
+          validation_fraction: 0.1
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 8188c3bdfcd989d345ffafa8d69ee3f8.dir
+      size: 9269502
+      nfiles: 601
+  train:
+    cmd: python scripts/train.py --data data/processed --model 
+      models/model.joblib --artifacts artifacts --params params.yaml
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 8188c3bdfcd989d345ffafa8d69ee3f8.dir
+      size: 9269502
+      nfiles: 601
+    - path: scripts/train.py
+      hash: md5
+      md5: 05b3bbb65b34750332303748527edce5
+      size: 877
+    - path: src/mlops_cats_dogs/features.py
+      hash: md5
+      md5: 1e5b0694b69a276af4fd0de26424b241
+      size: 2957
+    - path: src/mlops_cats_dogs/model.py
+      hash: md5
+      md5: 3d255865788e4ff1c052a6147c7472ad
+      size: 1460
+    - path: src/mlops_cats_dogs/train.py
+      hash: md5
+      md5: 20f7de8c125ddd797e15d13c938f062a
+      size: 9011
+    params:
+      params.yaml:
+        train:
+          feature_size: 64
+          histogram_bins: 16
+          epochs: 12
+          trees_per_epoch: 25
+          max_features: sqrt
+          seed: 42
+    outs:
+    - path: artifacts/history.csv
+      hash: md5
+      md5: bf828ab272d96d2d118f454d703e6f1c
+      size: 783
+    - path: artifacts/metrics.json
+      hash: md5
+      md5: 00fa30e77231f6aaa212bae10fe0c8a4
+      size: 270
+    - path: models/model.joblib
+      hash: md5
+      md5: 7b2c4878537a9d0f5b76636e242dd866
+      size: 528266

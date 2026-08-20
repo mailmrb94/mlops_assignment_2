@@ -1,0 +1,13 @@
+prepare:
+  image_size: 224
+  max_per_class: 300
+  seed: 42
+  train_fraction: 0.8
+  validation_fraction: 0.1
+train:
+  feature_size: 64
+  histogram_bins: 16
+  epochs: 12
+  trees_per_epoch: 25
+  max_features: sqrt
+  seed: 42

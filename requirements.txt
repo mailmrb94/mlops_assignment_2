@@ -1,0 +1,10 @@
+fastapi==0.116.1
+joblib==1.5.2
+mlflow-skinny==3.5.1
+numpy==2.3.3
+Pillow==11.3.0
+prometheus-client==0.23.1
+python-multipart==0.0.20
+scikit-learn==1.7.2
+uvicorn==0.35.0
+

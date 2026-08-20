@@ -1,0 +1,29 @@
+stages:
+  prepare:
+    cmd: python scripts/prepare_data.py --input data/raw --output data/processed --params params.yaml
+    deps:
+      - data/raw
+      - scripts/prepare_data.py
+      - src/mlops_cats_dogs/preprocessing.py
+    params:
+      - prepare
+    outs:
+      - data/processed
+  train:
+    cmd: python scripts/train.py --data data/processed --model models/model.joblib --artifacts artifacts --params params.yaml
+    deps:
+      - data/processed
+      - scripts/train.py
+      - src/mlops_cats_dogs/features.py
+      - src/mlops_cats_dogs/model.py
+      - src/mlops_cats_dogs/train.py
+    params:
+      - train
+    outs:
+      - models/model.joblib
+    metrics:
+      - artifacts/metrics.json:
+          cache: false
+    plots:
+      - artifacts/history.csv:
+          cache: false
