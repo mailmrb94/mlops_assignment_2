@@ -47,11 +47,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.1
+      - name: Check deployment configuration
+        id: deploy-config
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [[ -n "$DEPLOY_HOST" && -n "$DEPLOY_USER" && -n "$DEPLOY_SSH_KEY" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Production deployment skipped because DEPLOY_HOST, DEPLOY_USER, and DEPLOY_SSH_KEY are not all configured."
+          fi
+      - if: steps.deploy-config.outputs.configured == 'true'
+        uses: actions/checkout@v4
+      - if: steps.deploy-config.outputs.configured == 'true'
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
       - name: Deploy immutable image with Docker Compose
+        if: steps.deploy-config.outputs.configured == 'true'
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -61,6 +77,10 @@ jobs:
           ssh -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" \
             "cd '$DEPLOY_PATH' && IMAGE_NAME='$DEPLOY_IMAGE' docker compose pull && IMAGE_NAME='$DEPLOY_IMAGE' docker compose up -d --remove-orphans"
       - name: Post-deploy smoke test
+        if: steps.deploy-config.outputs.configured == 'true'
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: python scripts/smoke_test.py --base-url "http://$DEPLOY_HOST:8000" --image tests/fixtures/sample_cat.jpg
+      - name: Deployment status
+        if: steps.deploy-config.outputs.configured != 'true'
+        run: echo "Deployment was intentionally skipped; configure the production secrets to enable it."
