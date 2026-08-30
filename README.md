@@ -15,7 +15,7 @@ publishes immutable images through GitHub Actions, and exposes operational metri
 
 The champion improves test accuracy by **28.33 percentage points** and makes only one
 error on the 60-image held-out test set. Candidate selection used validation data only;
-the test split was opened once after the model and hyperparameters were locked.
+the test split was opened once after the model and hyperparameters were locked..
 
 ## Architecture
 
