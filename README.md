@@ -75,6 +75,7 @@ variable if the checkout on the host is not `/opt/cats-dogs-mlops`.
 - `docker-compose.yml`: deployment manifest
 - `dvc.yaml` / `dvc.lock`: reproducible data and model pipeline
 - `docs/`: final report and demonstration assets
+- `output/docx/MLOps_Assignment_2_Report_Editable.docx`: editable Word report
 
 ## Reproducibility notes
 

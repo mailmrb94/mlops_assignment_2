@@ -9,10 +9,6 @@ stages:
       md5: 5afd58885b3664ee793efbe05d1beb1e.dir
       size: 15034037
       nfiles: 602
-    - path: params.yaml
-      hash: md5
-      md5: df02d7fe6af93b28e828336cef9102ca
-      size: 222
     - path: scripts/prepare_data.py
       hash: md5
       md5: b03ee01505002ba8b04ad579fbcc6cfd
