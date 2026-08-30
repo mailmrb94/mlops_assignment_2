@@ -1,0 +1,11 @@
+{
+  "test_accuracy": 0.7,
+  "test_log_loss": 0.6196187197415365,
+  "test_precision": 0.6764705882352942,
+  "test_recall": 0.7666666666666667,
+  "test_f1": 0.71875,
+  "train_images": 480,
+  "augmented_train_samples": 960,
+  "validation_images": 60,
+  "test_images": 60
+}

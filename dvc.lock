@@ -50,31 +50,43 @@ stages:
       size: 2957
     - path: src/mlops_cats_dogs/model.py
       hash: md5
-      md5: 3d255865788e4ff1c052a6147c7472ad
-      size: 1460
+      md5: 0ae54b829d25ebeda60e585d865a4501
+      size: 3383
     - path: src/mlops_cats_dogs/train.py
       hash: md5
-      md5: 20f7de8c125ddd797e15d13c938f062a
-      size: 9011
+      md5: cd394b8921cbed863e038f8305f62cc7
+      size: 656
+    - path: src/mlops_cats_dogs/transfer_learning.py
+      hash: md5
+      md5: 96010dfa9af4432f8966258a39696e8d
+      size: 14837
     params:
       params.yaml:
         train:
-          feature_size: 64
-          histogram_bins: 16
-          epochs: 12
-          trees_per_epoch: 25
-          max_features: sqrt
+          model_type: mobilenet_v3_small_transfer
+          backbone: mobilenet_v3_small_imagenet
+          batch_size: 32
+          classifier_candidates:
+            logistic_regression:
+            - 0.1
+            - 1.0
+            - 10.0
+            linear_svc:
+            - 0.1
+            rbf_svc:
+            - 1.0
+            - 3.0
           seed: 42
     outs:
     - path: artifacts/history.csv
       hash: md5
-      md5: bf828ab272d96d2d118f454d703e6f1c
-      size: 783
+      md5: 1f9df4e8dd86de725cf397fd1632beb5
+      size: 1441
     - path: artifacts/metrics.json
       hash: md5
-      md5: 00fa30e77231f6aaa212bae10fe0c8a4
-      size: 270
-    - path: models/model.joblib
+      md5: 0d8ea5b12099c4c5df5da60561021c16
+      size: 352
+    - path: artifacts/model_manifest.json
       hash: md5
-      md5: 7b2c4878537a9d0f5b76636e242dd866
-      size: 528266
+      md5: 926b0af24554739d85a8911570143124
+      size: 426

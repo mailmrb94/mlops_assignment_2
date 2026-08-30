@@ -17,12 +17,13 @@ stages:
       - src/mlops_cats_dogs/features.py
       - src/mlops_cats_dogs/model.py
       - src/mlops_cats_dogs/train.py
+      - src/mlops_cats_dogs/transfer_learning.py
     params:
       - train
-    outs:
-      - models/model.joblib
     metrics:
       - artifacts/metrics.json:
+          cache: false
+      - artifacts/model_manifest.json:
           cache: false
     plots:
       - artifacts/history.csv:

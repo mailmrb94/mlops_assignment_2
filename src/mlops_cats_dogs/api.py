@@ -34,7 +34,7 @@ async def lifespan(application: FastAPI):
     yield
 
 
-app = FastAPI(title="Cats vs Dogs Classifier", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Cats vs Dogs Classifier", version="2.0.0", lifespan=lifespan)
 app.state.model = None
 
 

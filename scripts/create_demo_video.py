@@ -134,14 +134,14 @@ def main() -> None:
             ("./artifacts/{metrics,history,confusion_matrix}", MUTED),
             ("./dvc.yaml   ./dvc.lock   ./params.yaml", WHITE),
             ("./Dockerfile   ./docker-compose.yml", WHITE),
-            ("./models/model.joblib", GREEN),
+            ("./models/{model.joblib,mobilenet_v3_small_features.onnx}", GREEN),
             ("./scripts/{download,prepare,train,smoke_test}.py", MUTED),
-            ("./src/mlops_cats_dogs/{api,model,features}.py", WHITE),
+            ("./src/mlops_cats_dogs/{api,model,transfer_learning}.py", WHITE),
             ("./tests/{preprocessing,model,api}", GREEN),
         ],
     )
     card(draw, (755, 136, 1232, 358), "Submission package", ["Source and configuration", "Trained model artifact", "Report and demo video", "Reproduction instructions"])
-    card(draw, (755, 378, 1232, 646), "Design goal", ["Fast laptop baseline", "Deterministic seed 42", "Safe request validation", "Immutable deployment tags", "No sensitive image logging"], BLUE)
+    card(draw, (755, 378, 1232, 646), "Design goal", ["High-quality transfer model", "No test-set leakage", "ONNX runtime serving", "Immutable deployment tags", "No sensitive image logging"], BLUE)
     scenes.append((save_scene(2, image), 12))
 
     image, draw = base("Data and DVC", "600 audited images -> 224x224 RGB -> deterministic splits", 3, total)
@@ -153,7 +153,7 @@ def main() -> None:
         ("Running stage 'prepare'", BLUE),
         ("Prepared 600 images at data/processed", GREEN),
         ("train: 480  validation: 60  test: 60", WHITE),
-        ("train augmentation: horizontal flip -> 960 samples", WHITE),
+        ("candidate augmentation: original vs horizontal flip", WHITE),
         ("Running stage 'train'", BLUE),
         ("model + metrics + plots -> DVC cache", GREEN),
         ("Updating lock file 'dvc.lock'", MUTED),
@@ -162,48 +162,48 @@ def main() -> None:
     draw.text((50, 555), "Dataset row + label + source path + SHA-256", font=BODY, fill=MUTED)
     scenes.append((save_scene(3, image), 15))
 
-    image, draw = base("Model and Evaluation", "Lightweight HOG + color random-forest baseline", 4, total)
-    image.paste(fit_image(ROOT / "artifacts" / "training_curves.png", (48, 152, 735, 535), "#FFFFFF"), (48, 152))
+    image, draw = base("Model and Evaluation", "Frozen MobileNetV3-Small features + regularized classifier", 4, total)
+    image.paste(fit_image(ROOT / "artifacts" / "model_comparison.png", (48, 152, 735, 535), "#FFFFFF"), (48, 152))
     card(draw, (770, 150, 1228, 536), "Held-out test metrics", [
         f"Accuracy        {metrics['test_accuracy']:.3f}",
         f"Precision       {metrics['test_precision']:.3f}",
         f"Recall          {metrics['test_recall']:.3f}",
         f"F1              {metrics['test_f1']:.3f}",
         f"Log loss        {metrics['test_log_loss']:.3f}",
-        "Confusion: [[19,11],[7,23]]",
+        "Confusion: [[30,0],[1,29]]",
     ], GREEN)
     draw.text((48, 570), "Serialized artifact", font=SUBTITLE, fill=WHITE)
-    draw.text((48, 605), "models/model.joblib  |  model version 1.0.0  |  516 KB", font=BODY, fill=MUTED)
+    draw.text((48, 605), "ONNX 3.5 MB + classifier 19 KB  |  model version 2.0.0", font=BODY, fill=MUTED)
     scenes.append((save_scene(4, image), 15))
 
-    image, draw = base("MLflow Tracking", "Parameters, metrics, model, plots, and evaluation batch", 5, total)
-    card(draw, (50, 150, 397, 575), "Experiment", ["cats-vs-dogs-baseline", "run: random-forest baseline", "tracking URI: ./mlruns", "local, open source"], BLUE)
-    card(draw, (425, 150, 805, 575), "Logged metrics", ["test_accuracy = 0.700", "test_f1 = 0.719", "test_log_loss = 0.620", "precision and recall", "all training parameters"], GREEN)
-    card(draw, (833, 150, 1230, 575), "Logged artifacts", ["model.joblib", "training_curves.png", "confusion_matrix.json", "sample_requests.csv", "history.csv", "metrics.json"], TEAL)
+    image, draw = base("MLflow Tracking", "Baseline and champion runs with complete evidence", 5, total)
+    card(draw, (50, 150, 397, 575), "Experiment", ["model-development", "baseline reference", "MobileNetV3 champion", "tracking URI: ./mlruns"], BLUE)
+    card(draw, (425, 150, 805, 575), "Logged metrics", ["test_accuracy = 0.983", "test_f1 = 0.983", "test_log_loss = 0.032", "+28.33 accuracy points", "validation-only selection"], GREEN)
+    card(draw, (833, 150, 1230, 575), "Logged artifacts", ["model + ONNX", "model_manifest.json", "model_comparison.png", "candidate search", "confusion matrix", "sample requests"], TEAL)
     terminal(draw, (235, 590, 1045, 671), "mlflow ui --backend-store-uri ./mlruns", [("Listening at http://127.0.0.1:5000", GREEN)])
     scenes.append((save_scene(5, image), 12))
 
     image, draw = base("Automated Tests", "Preprocessing, inference utility, and API contracts", 6, total)
     terminal(draw, (120, 154, 1160, 560), "pytest -q", [
         ("tests/test_preprocessing.py ..", GREEN),
-        ("tests/test_model.py .", GREEN),
+        ("tests/test_model.py ..", GREEN),
         ("tests/test_api.py ..", GREEN),
         ("", WHITE),
-        (".....                                                    [100%]", GREEN),
-        ("5 passed in 1.96s", GREEN),
+        ("......                                                   [100%]", GREEN),
+        ("6 passed", GREEN),
     ])
     draw.text((120, 598), "CI gate: a failing test prevents image creation and deployment.", font=SUBTITLE, fill=YELLOW)
     scenes.append((save_scene(6, image), 12))
 
     image, draw = base("FastAPI Inference", "Validated multipart image -> label + class probabilities", 7, total)
     terminal(draw, (48, 145, 1232, 600), "uvicorn mlops_cats_dogs.api:app --port 8000", [
-        ("INFO model_loaded path=models/model.joblib version=1.0.0", BLUE),
+        ("INFO model_loaded backend=onnx_mobilenet_v3_small version=2.0.0", BLUE),
         ("INFO Application startup complete", GREEN),
         ("", WHITE),
-        ("GET  /health   -> 200  {status: healthy, model_version: 1.0.0}", WHITE),
+        ("GET  /health   -> 200  {status: healthy, model_version: 2.0.0}", WHITE),
         ("POST /predict  -> 200", WHITE),
-        ('{ "label": "dog", "confidence": 0.5267,', GREEN),
-        ('  "probabilities": {"cat": 0.4733, "dog": 0.5267} }', GREEN),
+        ('{ "label": "dog", "confidence": 0.9821,', GREEN),
+        ('  "probabilities": {"cat": 0.0179, "dog": 0.9821} }', GREEN),
         ("GET  /docs     -> interactive OpenAPI", MUTED),
     ])
     draw.text((48, 625), "Safety: JPEG/PNG/WebP only | 10 MB limit | invalid payloads rejected", font=BODY, fill=MUTED)
@@ -211,10 +211,10 @@ def main() -> None:
 
     image, draw = base("Smoke Test", "The same checks run after deployment and fail the release", 8, total)
     terminal(draw, (80, 155, 1200, 570), "python scripts/smoke_test.py --image sample.jpg", [
-        ('health={"status":"healthy","model_version":"1.0.0"}', GREEN),
+        ('health={"status":"healthy","model_version":"2.0.0"}', GREEN),
         ("prediction={", WHITE),
-        ('  "label":"dog", "confidence":0.5267,', GREEN),
-        ('  "probabilities":{"cat":0.4733,"dog":0.5267}', GREEN),
+        ('  "label":"dog", "confidence":0.9821,', GREEN),
+        ('  "probabilities":{"cat":0.0179,"dog":0.9821}', GREEN),
         ("}", WHITE),
         ("exit status: 0", GREEN),
     ])
@@ -226,7 +226,7 @@ def main() -> None:
     terminal(draw, (50, 150, 700, 620), "docker build -t cats-dogs-mlops:local .", [
         ("FROM python:3.11-slim", BLUE),
         ("pip install pinned production dependencies", WHITE),
-        ("COPY models/model.joblib", GREEN),
+        ("COPY model.joblib + MobileNetV3 ONNX", GREEN),
         ("USER app", GREEN),
         ("HEALTHCHECK GET /health", GREEN),
         ("CMD uvicorn ... --port 8000", WHITE),
@@ -279,7 +279,7 @@ def main() -> None:
 
     image, draw = base("Submission Ready", "All five modules mapped to runnable evidence", 13, total)
     items = [
-        ("M1", "DVC + model + MLflow"),
+        ("M1", "DVC + transfer model + MLflow"),
         ("M2", "FastAPI + Docker"),
         ("M3", "Tests + CI + GHCR"),
         ("M4", "Compose CD + smoke test"),

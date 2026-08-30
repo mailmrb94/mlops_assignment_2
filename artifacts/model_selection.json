@@ -1,14 +1,110 @@
 {
-  "selected_variant": "original",
   "selection_rule": "highest validation accuracy, then lowest validation log loss",
-  "candidates": {
-    "original": {
-      "validation_accuracy": 0.7333333333333333,
-      "validation_log_loss": 0.6117504527467857
+  "selected_candidate": {
+    "candidate": "original:logistic_regression:C=0.1",
+    "variant": "original",
+    "classifier": "logistic_regression",
+    "regularization": 0.1,
+    "validation_accuracy": 0.9833333333333333,
+    "validation_log_loss": 0.0857532334006451
+  },
+  "candidates": [
+    {
+      "candidate": "original:logistic_regression:C=0.1",
+      "variant": "original",
+      "classifier": "logistic_regression",
+      "regularization": 0.1,
+      "validation_accuracy": 0.9833333333333333,
+      "validation_log_loss": 0.0857532334006451
     },
-    "horizontal_flip_augmented": {
-      "validation_accuracy": 0.6666666666666666,
-      "validation_log_loss": 0.620449451795592
+    {
+      "candidate": "original:logistic_regression:C=1.0",
+      "variant": "original",
+      "classifier": "logistic_regression",
+      "regularization": 1.0,
+      "validation_accuracy": 0.9833333333333333,
+      "validation_log_loss": 0.10043133553337946
+    },
+    {
+      "candidate": "original:logistic_regression:C=10.0",
+      "variant": "original",
+      "classifier": "logistic_regression",
+      "regularization": 10.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.0976263870054915
+    },
+    {
+      "candidate": "original:linear_svc:C=0.1",
+      "variant": "original",
+      "classifier": "linear_svc",
+      "regularization": 0.1,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.10054306110216207
+    },
+    {
+      "candidate": "original:rbf_svc:C=1.0",
+      "variant": "original",
+      "classifier": "rbf_svc",
+      "regularization": 1.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.07716008128735874
+    },
+    {
+      "candidate": "original:rbf_svc:C=3.0",
+      "variant": "original",
+      "classifier": "rbf_svc",
+      "regularization": 3.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.07894698042718057
+    },
+    {
+      "candidate": "horizontal_flip_augmented:logistic_regression:C=0.1",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "logistic_regression",
+      "regularization": 0.1,
+      "validation_accuracy": 0.9833333333333333,
+      "validation_log_loss": 0.08964900454828387
+    },
+    {
+      "candidate": "horizontal_flip_augmented:logistic_regression:C=1.0",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "logistic_regression",
+      "regularization": 1.0,
+      "validation_accuracy": 0.9833333333333333,
+      "validation_log_loss": 0.11081171779318102
+    },
+    {
+      "candidate": "horizontal_flip_augmented:logistic_regression:C=10.0",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "logistic_regression",
+      "regularization": 10.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.11545872861609043
+    },
+    {
+      "candidate": "horizontal_flip_augmented:linear_svc:C=0.1",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "linear_svc",
+      "regularization": 0.1,
+      "validation_accuracy": 0.9833333333333333,
+      "validation_log_loss": 0.0873133599211979
+    },
+    {
+      "candidate": "horizontal_flip_augmented:rbf_svc:C=1.0",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "rbf_svc",
+      "regularization": 1.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.08016950276870333
+    },
+    {
+      "candidate": "horizontal_flip_augmented:rbf_svc:C=3.0",
+      "variant": "horizontal_flip_augmented",
+      "classifier": "rbf_svc",
+      "regularization": 3.0,
+      "validation_accuracy": 0.9666666666666667,
+      "validation_log_loss": 0.08075055714826293
     }
-  }
+  ],
+  "test_set_used_for_selection": false
 }

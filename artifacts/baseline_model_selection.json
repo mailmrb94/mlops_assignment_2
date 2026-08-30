@@ -1,0 +1,14 @@
+{
+  "selected_variant": "original",
+  "selection_rule": "highest validation accuracy, then lowest validation log loss",
+  "candidates": {
+    "original": {
+      "validation_accuracy": 0.7333333333333333,
+      "validation_log_loss": 0.6117504527467857
+    },
+    "horizontal_flip_augmented": {
+      "validation_accuracy": 0.6666666666666666,
+      "validation_log_loss": 0.620449451795592
+    }
+  }
+}

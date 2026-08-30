@@ -186,7 +186,7 @@ def architecture_table():
     cells = [
         ("DATA", "Public mirror\n+ SHA-256 provenance"),
         ("DVC", "224x224 RGB\n80/10/10 split"),
-        ("MODEL", "HOG + color\nRandom forest"),
+        ("MODEL", "MobileNetV3\nONNX + LR"),
         ("SERVE", "FastAPI\nPrometheus"),
         ("DELIVER", "Docker + GHCR\nCompose CD"),
     ]
@@ -246,7 +246,7 @@ def build_story():
                 ["Course", "MLOps (S1-25_AIMLCZG523)"],
                 ["Use case", "Pet adoption platform - Cats vs Dogs"],
                 ["Submission", "Source, DVC, model, Docker, CI/CD, report, demo"],
-                ["Prepared", "20 August 2026"],
+                ["Prepared", "30 August 2026"],
             ],
             [35 * mm, 110 * mm],
             header=False,
@@ -258,7 +258,7 @@ def build_story():
             "A balanced 600-image sample from the Microsoft/Kaggle Cats-vs-Dogs collection is "
             "downloaded through a public mirror with per-image SHA-256 provenance. DVC produces "
             "deterministic 80/10/10 splits and runs training. MLflow logs parameters, evaluation "
-            "metrics, the serialized model, confusion matrix, sample requests, and learning curves.",
+            "metrics, the ONNX-backed model, confusion matrix, candidate table, and request batch.",
         ),
         p(
             "The inference layer is a FastAPI service with health, prediction, and Prometheus "
@@ -268,7 +268,8 @@ def build_story():
         ),
         p(
             f"Verified result: <b>{metrics['test_accuracy']:.0%} test accuracy</b>, "
-            f"<b>{metrics['test_f1']:.3f} F1</b>, and <b>5/5 automated tests passing</b>.",
+            f"<b>{metrics['test_f1']:.3f} F1</b>, <b>+28.33 points over baseline</b>, and "
+            "<b>6/6 automated tests passing</b>.",
             "Callout",
         ),
         p("Assignment-to-deliverable map", "Subsection"),
@@ -290,7 +291,7 @@ def build_story():
                 ["Concern", "Choice", "Reason"],
                 ["Versioning", "Git + DVC", "Separates lightweight code history from data/model lineage."],
                 ["Tracking", "MLflow", "Open source, local-first, logs metrics and arbitrary artifacts."],
-                ["Model", "Random forest", "Fast laptop baseline with calibrated class proportions."],
+                ["Model", "MobileNetV3 + LR", "Pretrained visual features with a regularized head."],
                 ["Serving", "FastAPI", "Typed REST API, validation, and automatic OpenAPI docs."],
                 ["Delivery", "Docker + GHCR + Compose", "Portable artifact and a simple reproducible target."],
             ],
@@ -302,7 +303,7 @@ def build_story():
         p(
             "Git versions all source and configuration files. DVC defines two dependency-aware "
             "stages: <b>prepare</b> and <b>train</b>. The lock file captures hashes for code, data, "
-            "parameters, processed output, metrics, history, and the trained model. A local DVC "
+            "parameters, processed output, metrics, history, and the signed model manifest. A local DVC "
             "remote is configured for offline reproducibility; it can be replaced with S3 or another "
             "remote without changing the pipeline.",
         ),
@@ -326,23 +327,25 @@ def build_story():
             ],
             [42 * mm, 113 * mm],
         ),
-        p("2.3 Baseline model", "Subsection"),
+        p("2.3 Baseline, champion, and leakage-safe selection", "Subsection"),
         p(
-            "Every standardized image is summarized by HOG-style edge descriptors, a compact "
-            "16x16 RGB thumbnail, and per-channel color histograms. A 300-tree random forest is "
-            "grown in 12 increments of 25 trees; the increments provide train/validation learning "
-            "curves. Original-only and horizontally augmented candidates are compared using validation "
-            "accuracy (0.733 vs 0.667), so the original-only candidate is selected without consulting "
-            "the test set. The final estimator supports class probabilities. The complete inference "
-            "bundle is serialized with joblib and includes feature settings, class names, model "
-            "version, and evaluation metadata. Deterministic horizontal flips expand 480 training "
-            "images into 960 training samples without contaminating validation or test data.",
+            "The original HOG, color-histogram, and 300-tree random-forest pipeline is preserved as a "
+            "70.0% test-accuracy baseline. The champion freezes an ImageNet-pretrained MobileNetV3-Small "
+            "feature extractor and maps each image to a 576-dimensional embedding. This reuses robust "
+            "visual features without fitting millions of deep-network parameters to only 480 images.",
+        ),
+        p(
+            "Twelve candidates compare logistic regression, linear SVC, and RBF SVC across original and "
+            "horizontal-flip representations. Selection uses validation accuracy only, with lower validation "
+            "log loss as the tie-breaker. Original images plus logistic regression (C=0.1) won at 98.33% "
+            "validation accuracy. It was retrained on 540 train+validation images before the test set was "
+            "opened once. The feature extractor is exported to ONNX and its SHA-256 is verified at load.",
         ),
         p("2.4 MLflow tracking", "Subsection"),
-        bullet("Experiment: <b>cats-vs-dogs-baseline</b>; run: <b>random-forest-hog-baseline</b>."),
-        bullet("Parameters: feature size, histogram bins, epochs, trees per epoch, max features, seed."),
+        bullet("Experiment: <b>cats-vs-dogs-model-development</b>; baseline reference and champion runs."),
+        bullet("Parameters: backbone, pretrained weights, candidate grid, augmentation, C, and seed."),
         bullet("Metrics: accuracy, log loss, precision, recall, and F1."),
-        bullet("Artifacts: model.joblib, metrics JSON, confusion matrix, CSV history, curves, labeled request batch."),
+        bullet("Artifacts: model bundle, ONNX graph, manifest, candidate table, comparison plot, confusion matrix, and requests."),
         PageBreak(),
         p("3. Evaluation Results", "Section"),
         table(
@@ -371,11 +374,10 @@ def build_story():
             ]
         ),
         Spacer(1, 7 * mm),
-        Image(str(ROOT / "artifacts" / "training_curves.png"), width=155 * mm, height=62 * mm),
+        Image(str(ROOT / "artifacts" / "model_comparison.png"), width=155 * mm, height=62 * mm),
         p(
-            "Figure 1. Training and validation loss/accuracy as the forest grows from 25 to 300 trees. "
-            "The gap indicates expected overfitting for a deliberately small baseline dataset; transfer "
-            "learning on the full dataset is the recommended next model iteration.",
+            "Figure 1. Held-out comparison of the preserved random-forest baseline and the MobileNetV3 "
+            "champion. Accuracy rises from 70.00% to 98.33%, a 28.33 percentage-point gain.",
             "Small",
         ),
         p("Post-deployment performance batch", "Subsection"),
@@ -401,9 +403,9 @@ def build_story():
             "POST /predict\n"
             "{\n"
             '  "label": "dog",\n'
-            '  "confidence": 0.5267,\n'
-            '  "probabilities": {"cat": 0.4733, "dog": 0.5267},\n'
-            '  "model_version": "1.0.0"\n'
+            '  "confidence": 0.9821,\n'
+            '  "probabilities": {"cat": 0.0179, "dog": 0.9821},\n'
+            '  "model_version": "2.0.0"\n'
             "}",
             styles["CodeBlock"],
         ),
@@ -411,13 +413,14 @@ def build_story():
         p(
             "Production and development dependencies are fully pinned. The package uses a src layout "
             "and declares Python 3.11+. The service validates content type, file size, and decoded image "
-            "content, then executes exactly the same feature path used during training.",
+            "content, then executes the exported ONNX feature graph used during training. PyTorch remains "
+            "a separate training dependency and is not required by the production image.",
         ),
         p("4.3 Container", "Subsection"),
         bullet("Base: <b>python:3.11-slim</b>; no compiler or notebook runtime in the final image."),
         bullet("Runs as a non-root system user and exposes only port 8000."),
         bullet("Includes a Docker health check against <b>/health</b>."),
-        bullet("Copies the versioned model artifact into a fixed, environment-overridable path."),
+        bullet("Copies the checksum-verified joblib classifier and ONNX feature extractor into fixed paths."),
         bullet("A .dockerignore excludes datasets, caches, tests, reports, and local environments."),
         Preformatted(
             "$ docker build -t cats-dogs-mlops:local .\n"
@@ -436,7 +439,7 @@ def build_story():
                 ["Step", "Automated gate", "Failure effect"],
                 ["Checkout/setup", "Python 3.11 and pip cache", "Workflow stops"],
                 ["Install", "Pinned prod + dev dependencies", "Workflow stops"],
-                ["Test", "Five pytest unit/API tests", "Image is not built"],
+                ["Test", "Six pytest unit/API/ONNX tests", "Image is not built"],
                 ["Build", "BuildKit multi-platform-capable build", "Image is not published"],
                 ["Publish", "GHCR login with GITHUB_TOKEN", "Deployment is blocked"],
                 ["Tag", "Commit SHA and latest", "Supports rollback and convenience"],
@@ -449,7 +452,8 @@ def build_story():
         bullet("Feature vector and prediction response contract."),
         bullet("Health and valid multipart prediction endpoints."),
         bullet("Unsupported upload content type returns HTTP 415."),
-        Preformatted("$ pytest -q\n.....  [100%]\n5 passed in 1.96s", styles["CodeBlock"]),
+        bullet("ONNX backend, SHA-256, embedding size, and probability contract."),
+        Preformatted("$ pytest -q\n......  [100%]\n6 passed", styles["CodeBlock"]),
         p("Artifact publishing", "Subsection"),
         p(
             "On pushes, GitHub Actions authenticates to <b>ghcr.io</b> with the repository-scoped token "
@@ -525,13 +529,13 @@ def build_story():
             [
                 ["Check", "Observed result", "Status"],
                 ["DVC reproduce", "600 images, two stages, lock file updated", "PASS"],
-                ["Model artifact", "models/model.joblib, 516 KB", "PASS"],
+                ["Model artifacts", "joblib 19 KB + ONNX 3.5 MB; hashes verified", "PASS"],
                 ["MLflow", "Runs, params, metrics, and artifacts written", "PASS"],
-                ["pytest", "5 passed, 0 warnings", "PASS"],
+                ["pytest", "6 passed, 0 warnings", "PASS"],
                 ["Live API", "Health + prediction HTTP 200", "PASS"],
                 ["Monitoring", "Request counters and latency exported", "PASS"],
                 ["Compose manifest", "Docker Compose configuration included", "PASS"],
-                ["Container pull", "Docker Hub base-image access required", "Environment dependent"],
+                ["Model gain", "+28.33 percentage points over baseline", "PASS"],
             ],
             [43 * mm, 85 * mm, 27 * mm],
         ),
@@ -541,7 +545,7 @@ def build_story():
         Preformatted(
             "python -m venv .venv\n"
             "source .venv/bin/activate\n"
-            "pip install -r requirements.txt -r requirements-dev.txt\n"
+            "pip install -r requirements.txt -r requirements-dev.txt -r requirements-train.txt\n"
             "pip install .\n"
             "python scripts/download_data.py --output data/raw\n"
             "dvc repro\n"
@@ -566,17 +570,17 @@ def build_story():
                 ["Trained model and evaluation artifacts", "Yes"],
                 ["Dockerfile + Compose", "Yes"],
                 ["CI/CD workflow", "Yes"],
-                ["PDF report", "Yes"],
+                ["Editable Word report and PDF report", "Yes"],
                 ["Sub-five-minute demonstration video", "Yes"],
             ],
             [100 * mm, 55 * mm],
         ),
         p("Limitations and next steps", "Subsection"),
         p(
-            "This is a deliberately lightweight baseline trained on 600 images, not a production pet "
-            "recognition model. Accuracy should be improved through transfer learning (for example, "
-            "MobileNet or ResNet), a larger stratified dataset, augmentation, calibration, and model "
-            "fairness checks. The CI/CD configuration is complete but requires repository secrets, a GHCR "
+            "The transfer-learning champion is strong on the fixed 60-image test split, but the 600-image "
+            "teaching sample is not sufficient evidence for production. Promotion should require a larger "
+            "external test set, source and breed slices, calibration monitoring, drift analysis, and fairness "
+            "checks. The CI/CD configuration is complete but requires repository secrets, a GHCR "
             "namespace, and an external Compose host to execute the production deployment path.",
         ),
         p("References", "Section"),

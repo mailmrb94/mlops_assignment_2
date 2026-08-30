@@ -3,30 +3,38 @@
 ## Verified results
 
 - Dataset sample: 600 images (300 cats, 300 dogs)
-- Split: 480 train, 60 validation, 60 test
-- Training augmentation: deterministic horizontal flips (960 candidate samples)
-- Model selection: original-only candidate selected by validation accuracy (0.733 vs 0.667)
-- Held-out test accuracy: 0.700
-- Held-out test F1: 0.719
-- Automated tests: 5 passed
-- Live smoke test: health HTTP 200 and prediction HTTP 200
-- DVC status: data and pipelines up to date
-- Report: 8 A4 pages, visually rendered and inspected
-- Demo video: 3 minutes 6 seconds, H.264 1280x720
+- Split: 480 train, 60 validation, 60 untouched test
+- Candidate search: 12 combinations across two image variants and three classifier families
+- Selection rule: highest validation accuracy, then lowest validation log loss
+- Champion: frozen MobileNetV3-Small embeddings + Logistic Regression (`C=0.1`)
+- Champion validation accuracy: 0.9833
+- Held-out test accuracy: 0.9833 (baseline 0.7000; gain +0.2833)
+- Held-out precision / recall / F1: 1.0000 / 0.9667 / 0.9831
+- Held-out confusion matrix: `[[30, 0], [1, 29]]`
+- Automated tests: 6 passed
+- DVC status: data and pipelines reproducible from `dvc.yaml` and `dvc.lock`
+- MLflow: baseline and champion runs, parameters, metrics, models, plots, and request batch
+- Serving: FastAPI 2.0.0 with checksum-verified ONNX Runtime inference
+- Delivery: Docker, Compose, GHCR CI/CD, post-deployment health/prediction smoke test
+- Reports: editable Word document plus visually verified PDF
+- Demo: sub-five-minute H.264 walkthrough
 
-## Primary artifacts and SHA-256
+## Primary artifacts
 
 | Artifact | Bytes | SHA-256 |
 |---|---:|---|
-| `models/model.joblib` | 528266 | `2fb9005ae11b02201d3b952c94fc5f6d31f8e42f1ce895b45c6cbd873bc8a5e7` |
-| `output/pdf/MLOps_Assignment_2_Report.pdf` | 71578 | `cb1ff3247e1328ec6806208da7d4e3593b69f46d583829fd040f2ae5488be6d6` |
-| `docs/MLOps_Assignment_2_Demo.mp4` | 1254994 | `4ec261451a0b27a4d0c02b0504cd6eebc9bb193b46783d7febd5402db882af50` |
+| `models/model.joblib` | 18,945 | `a1f93aa106ebc398d130ffafc09f34416275d32931f5b3cab63f3bae21b28df0` |
+| `models/mobilenet_v3_small_features.onnx` | 3,717,020 | `355230de403faec174a9e0f19b4201645b11151961c9a5bb8c0808b9f37336e1` |
+| `output/docx/MLOps_Assignment_2_Report_Editable.docx` | 127,288 | `75cbb72ceee0dae301ac015772d47cbb7e787912676cb5f033126292bfa8fc7f` |
+| `output/pdf/MLOps_Assignment_2_Report.pdf` | 145,030 | `957ff8ab9412409851ed88286264dc52439ff4b5fcaf7c8944799846bcf24459` |
+| `docs/MLOps_Assignment_2_Demo.mp4` | 1,285,045 | `956ed6daad029ea640fd759042a969a5b3ac60c93132d029e382f9c712720b32` |
 
-## Environment note
+The model hashes also appear in `artifacts/model_manifest.json` and are verified at
+service startup.
 
-The service, tests, smoke test, DVC pipeline, MLflow logging, YAML manifests, report,
-and video were executed locally. Docker Desktop 29.6.1 was available, but the external
-Docker Hub base-image metadata request timed out in this environment. The Dockerfile
-and Compose manifest are included, and the GitHub Actions workflow performs the image
-build and GHCR publish when run in the repository.
+## Reproduction note
 
+Install production, development, and training dependencies before `dvc repro`. The
+production container needs only `requirements.txt`; PyTorch is used for training and ONNX
+export but is deliberately excluded from serving. Deployment is conditional on repository
+secrets so forks can run CI safely without possessing an external server.

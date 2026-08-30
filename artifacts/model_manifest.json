@@ -1,0 +1,14 @@
+{
+  "model_version": "2.0.0",
+  "model_backend": "onnx_mobilenet_v3_small",
+  "model_bundle": {
+    "path": "models/model.joblib",
+    "sha256": "a1f93aa106ebc398d130ffafc09f34416275d32931f5b3cab63f3bae21b28df0",
+    "bytes": 18945
+  },
+  "feature_extractor": {
+    "path": "models/mobilenet_v3_small_features.onnx",
+    "sha256": "355230de403faec174a9e0f19b4201645b11151961c9a5bb8c0808b9f37336e1",
+    "bytes": 3717020
+  }
+}

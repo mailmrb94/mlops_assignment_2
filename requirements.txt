@@ -2,6 +2,7 @@ fastapi==0.116.1
 joblib==1.5.2
 mlflow==3.5.1
 numpy==2.3.3
+onnxruntime==1.29.0
 Pillow==11.3.0
 prometheus-client==0.23.1
 python-multipart==0.0.20

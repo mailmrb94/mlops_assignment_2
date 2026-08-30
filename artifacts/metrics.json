@@ -1,11 +1,13 @@
 {
-  "test_accuracy": 0.7,
-  "test_log_loss": 0.6196187197415365,
-  "test_precision": 0.6764705882352942,
-  "test_recall": 0.7666666666666667,
-  "test_f1": 0.71875,
+  "test_accuracy": 0.9833333333333333,
+  "test_log_loss": 0.03215541139862117,
+  "test_precision": 1.0,
+  "test_recall": 0.9666666666666667,
+  "test_f1": 0.9830508474576272,
+  "baseline_test_accuracy": 0.7,
+  "accuracy_gain": 0.2833333333333333,
   "train_images": 480,
-  "augmented_train_samples": 960,
   "validation_images": 60,
+  "final_training_images": 540,
   "test_images": 60
 }

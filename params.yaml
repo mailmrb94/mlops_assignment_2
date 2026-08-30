@@ -5,9 +5,11 @@ prepare:
   train_fraction: 0.8
   validation_fraction: 0.1
 train:
-  feature_size: 64
-  histogram_bins: 16
-  epochs: 12
-  trees_per_epoch: 25
-  max_features: sqrt
+  model_type: mobilenet_v3_small_transfer
+  backbone: mobilenet_v3_small_imagenet
+  batch_size: 32
+  classifier_candidates:
+    logistic_regression: [0.1, 1.0, 10.0]
+    linear_svc: [0.1]
+    rbf_svc: [1.0, 3.0]
   seed: 42
