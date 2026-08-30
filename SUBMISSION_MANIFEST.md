@@ -25,7 +25,7 @@
 |---|---:|---|
 | `models/model.joblib` | 18,945 | `a1f93aa106ebc398d130ffafc09f34416275d32931f5b3cab63f3bae21b28df0` |
 | `models/mobilenet_v3_small_features.onnx` | 3,717,020 | `355230de403faec174a9e0f19b4201645b11151961c9a5bb8c0808b9f37336e1` |
-| `output/docx/MLOps_Assignment_2_Report_Editable.docx` | 127,288 | `75cbb72ceee0dae301ac015772d47cbb7e787912676cb5f033126292bfa8fc7f` |
+| `output/docx/MLOps_Assignment_2_Report_Editable.docx` | 393,091 | `c216e373537c053f1fac3f423f3e3e10af63f23888d8240a707316364f03de02` |
 | `output/pdf/MLOps_Assignment_2_Report.pdf` | 145,030 | `957ff8ab9412409851ed88286264dc52439ff4b5fcaf7c8944799846bcf24459` |
 | `docs/MLOps_Assignment_2_Demo.mp4` | 1,285,045 | `956ed6daad029ea640fd759042a969a5b3ac60c93132d029e382f9c712720b32` |
 

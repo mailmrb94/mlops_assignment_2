@@ -19,6 +19,8 @@ from docx.shared import Inches, Pt, RGBColor, Twips
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output" / "docx" / "MLOps_Assignment_2_Report_Editable.docx"
 CHART = ROOT / "artifacts" / "model_comparison.png"
+MLFLOW_SCREENSHOT = ROOT / "artifacts" / "screenshots" / "mlflow_champion_metrics_report.png"
+FASTAPI_SCREENSHOT = ROOT / "artifacts" / "screenshots" / "fastapi_openapi_v2.png"
 METRICS = ROOT / "artifacts" / "metrics.json"
 CONFUSION = ROOT / "artifacts" / "confusion_matrix.json"
 
@@ -475,9 +477,25 @@ def add_figure(doc, path):
             )
     caption = doc.add_paragraph(style="Figure Caption")
     caption.add_run(
-        "Figure 1. Held-out comparison of the preserved random-forest baseline and MobileNetV3 "
+        "Figure 2. Held-out comparison of the preserved random-forest baseline and MobileNetV3 "
         "champion. Accuracy rises from 70.00% to 98.33%, a 28.33 percentage-point gain."
     )
+
+
+def add_evidence_screenshot(doc, path, *, width, name, description, caption_text):
+    paragraph = doc.add_paragraph()
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    paragraph.paragraph_format.keep_together = True
+    run = paragraph.add_run()
+    run.add_picture(str(path), width=Inches(width))
+    drawing = run._r.find(qn("w:drawing"))
+    if drawing is not None:
+        doc_pr = drawing.find(".//" + qn("wp:docPr"))
+        if doc_pr is not None:
+            doc_pr.set("name", name)
+            doc_pr.set("descr", description)
+    caption = doc.add_paragraph(style="Figure Caption")
+    caption.add_run(caption_text)
 
 
 def build_document():
@@ -603,6 +621,17 @@ def build_document():
         "Artifacts: model bundle, ONNX graph, manifest, candidate table, comparison plot, confusion matrix, and requests.",
     ):
         add_bullet(doc, item, bullet_id)
+    add_evidence_screenshot(
+        doc,
+        MLFLOW_SCREENSHOT,
+        width=4.85,
+        name="MLflow champion metrics",
+        description="MLflow champion run showing 0.983 test F1, 0.983 test accuracy, 1.0 precision, and a 0.283 accuracy gain over baseline.",
+        caption_text=(
+            "Figure 1. MLflow evidence from the final MobileNetV3 champion run. The tracked metrics "
+            "show 0.983 accuracy/F1, 1.000 precision, 0.032 log loss, and the 0.283 gain over baseline."
+        ),
+    )
     add_heading(doc, "3. Evaluation Results", page_break_before=True)
     add_table(
         doc,
@@ -655,6 +684,17 @@ def build_document():
         '  "probabilities": {"cat": 0.0179, "dog": 0.9821},\n'
         '  "model_version": "2.0.0"\n'
         "}",
+    )
+    add_evidence_screenshot(
+        doc,
+        FASTAPI_SCREENSHOT,
+        width=6.15,
+        name="FastAPI OpenAPI interface",
+        description="Live FastAPI 2.0.0 OpenAPI page showing health and prediction endpoints.",
+        caption_text=(
+            "Figure 3. Live OpenAPI evidence for service version 2.0.0, exposing the health and "
+            "multipart image prediction contracts."
+        ),
     )
     add_heading(doc, "4.2 Reproducible environment", 2)
     doc.add_paragraph(
